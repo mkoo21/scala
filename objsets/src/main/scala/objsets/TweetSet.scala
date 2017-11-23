@@ -68,6 +68,8 @@ abstract class TweetSet {
    * and be implemented in the subclasses?
    */
     def mostRetweeted: Tweet 
+
+    def mostRetweetedAcc(best: Tweet): Tweet
   
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
@@ -78,7 +80,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def descendingByRetweet: TweetList = 
+    def descendingByRetweet: TweetList 
   
   /**
    * The following methods are already implemented
@@ -112,7 +114,12 @@ class Empty extends TweetSet {
     def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = new Empty
     
     def union(that: TweetSet): TweetSet = that
-  
+
+    def mostRetweeted : Tweet = throw new java.util.NoSuchElementException
+    
+    def mostRetweetedAcc(best: Tweet): Tweet = best
+
+    def descendingByRetweet(): TweetList = Nil()
   /**
    * The following methods are already implemented
    */
@@ -131,13 +138,36 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = { 
       if (p(this.elem)) acc.incl(this.elem)
       left.filterAcc( p, right.filterAcc(p, acc) )
-
-    }[M#Ç[M#Õ[M#Ð[M#Ð]]]]
+    }
 
     def union(that: TweetSet): TweetSet = {
-      this.incl(that.element).union(that.left).union(that.right)
+      this.left.union(this.right.union(that)).incl(this.elem)
     }
     
+    def moreRetweets(a: Tweet, b: Tweet) : Tweet = {
+      //Is not called on empty tweetsets
+      if(b.retweets > a.retweets) b
+      else a
+    }
+
+    //Start search with this as root
+    def mostRetweeted : Tweet = {
+      this.getMax(this.elem, List(this.left.mostRetweetedAcc(this.elem), this.right.mostRetweetedAcc(this.elem)), this.moreRetweets)
+    }
+
+    def getMax(best : Tweet, l : List[Tweet], bigger: (Tweet, Tweet) => Tweet) : Tweet = {
+      if(l.isEmpty) best
+      else getMax(bigger(best,l.head), l.tail, bigger)
+    }
+    
+    def mostRetweetedAcc(best : Tweet) : Tweet = {
+      val newBest = this.getMax(best, List(best,this.elem), this.moreRetweets)
+      this.getMax(newBest, List(this.left.mostRetweetedAcc(newBest), this.right.mostRetweetedAcc(newBest)), this.moreRetweets)
+    }
+
+    def descendingByRetweet(): TweetList = {
+    
+    }
   /**
    * The following methods are already implemented
    */
