@@ -56,7 +56,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def union(that: TweetSet): TweetSet = ???
+    def union(that: TweetSet): TweetSet 
   
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -67,7 +67,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def mostRetweeted: Tweet = ???
+    def mostRetweeted: Tweet 
   
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
@@ -78,7 +78,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def descendingByRetweet: TweetList = ???
+    def descendingByRetweet: TweetList = 
   
   /**
    * The following methods are already implemented
@@ -110,6 +110,8 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
     def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = new Empty
+    
+    def union(that: TweetSet): TweetSet = that
   
   /**
    * The following methods are already implemented
@@ -130,6 +132,10 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
       if (p(this.elem)) acc.incl(this.elem)
       left.filterAcc( p, right.filterAcc(p, acc) )
 
+    }[M#Ç[M#Õ[M#Ð[M#Ð]]]]
+
+    def union(that: TweetSet): TweetSet = {
+      this.incl(that.element).union(that.left).union(that.right)
     }
     
   /**
