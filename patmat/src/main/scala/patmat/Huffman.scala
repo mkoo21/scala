@@ -76,11 +76,10 @@ object Huffman {
    *   }
    */
     def times(chars: List[Char]): List[(Char, Int)] = {
-        val acc = Map[Char, Int]();
         def iter(acc : Map[Char, Int], c : Char ): Map[Char, Int] = {
             acc + ((c, (if(acc contains c ) ((acc get c).get + 1) else 1) ))
         }
-        chars.fold(Map[Char, Int]()) (iter)
+        chars.foldLeft(Map[Char, Int]()) (iter).toList
     }
   
   /**
