@@ -8,94 +8,98 @@ import common._
  */
 object Huffman {
 
-  /**
-   * A huffman code is represented by a binary tree.
-   *
-   * Every `Leaf` node of the tree represents one character of the alphabet that the tree can encode.
-   * The weight of a `Leaf` is the frequency of appearance of the character.
-   *
-   * The branches of the huffman tree, the `Fork` nodes, represent a set containing all the characters
-   * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
-   * leaves.
-   */
+    /**
+      * A huffman code is represented by a binary tree.
+      *
+      * Every `Leaf` node of the tree represents one character of the alphabet that the tree can encode.
+      * The weight of a `Leaf` is the frequency of appearance of the character.
+      *
+      * The branches of the huffman tree, the `Fork` nodes, represent a set containing all the characters
+      * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
+      * leaves.
+      */
     abstract class CodeTree
-    case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
-    case class Leaf(char: Char, weight: Int) extends CodeTree
-  
 
-  // Part 1: Basics
+    case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
+
+    case class Leaf(char: Char, weight: Int) extends CodeTree
+
+
+    // Part 1: Basics
     def weight(tree: CodeTree): Int = tree match {
         case Leaf(char, weight) => weight
         case Fork(left, right, chars, weight) => weight
     }
-  
+
     def chars(tree: CodeTree): List[Char] = tree match {
         case Leaf(char, _) => List(char)
         case Fork(_, _, chars, _) => chars
     }
-  
-  def makeCodeTree(left: CodeTree, right: CodeTree) =
-    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
+
+    def makeCodeTree(left: CodeTree, right: CodeTree) =
+        Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
 
+    // Part 2: Generating Huffman trees
 
-  // Part 2: Generating Huffman trees
+    /**
+      * In this assignment, we are working with lists of characters. This function allows
+      * you to easily create a character list from a given string.
+      */
+    def string2Chars(str: String): List[Char] = str.toList
 
-  /**
-   * In this assignment, we are working with lists of characters. This function allows
-   * you to easily create a character list from a given string.
-   */
-  def string2Chars(str: String): List[Char] = str.toList
-
-  /**
-   * This function computes for each unique character in the list `chars` the number of
-   * times it occurs. For example, the invocation
-   *
-   *   times(List('a', 'b', 'a'))
-   *
-   * should return the following (the order of the resulting list is not important):
-   *
-   *   List(('a', 2), ('b', 1))
-   *
-   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
-   * character and an integer. Pairs can be constructed easily using parentheses:
-   *
-   *   val pair: (Char, Int) = ('c', 1)
-   *
-   * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
-   *
-   *   val theChar = pair._1
-   *   val theInt  = pair._2
-   *
-   * Another way to deconstruct a pair is using pattern matching:
-   *
-   *   pair match {
-   *     case (theChar, theInt) =>
-   *       println("character is: "+ theChar)
-   *       println("integer is  : "+ theInt)
-   *   }
-   */
+    /**
+      * This function computes for each unique character in the list `chars` the number of
+      * times it occurs. For example, the invocation
+      *
+      * times(List('a', 'b', 'a'))
+      *
+      * should return the following (the order of the resulting list is not important):
+      *
+      * List(('a', 2), ('b', 1))
+      *
+      * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
+      * character and an integer. Pairs can be constructed easily using parentheses:
+      *
+      * val pair: (Char, Int) = ('c', 1)
+      *
+      * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
+      *
+      * val theChar = pair._1
+      * val theInt  = pair._2
+      *
+      * Another way to deconstruct a pair is using pattern matching:
+      *
+      * pair match {
+      * case (theChar, theInt) =>
+      * println("character is: "+ theChar)
+      * println("integer is  : "+ theInt)
+      * }
+      */
     def times(chars: List[Char]): List[(Char, Int)] = {
-        def iter(acc : Map[Char, Int], c : Char ): Map[Char, Int] = {
-            acc + ((c, (if(acc contains c ) ((acc get c).get + 1) else 1) ))
+        def iter(acc: Map[Char, Int], c: Char): Map[Char, Int] = {
+            acc + ((c, (if (acc contains c) ((acc get c).get + 1) else 1)))
         }
-        chars.foldLeft(Map[Char, Int]()) (iter).toList
+
+        chars.foldLeft(Map[Char, Int]())(iter).toList
     }
-  
-  /**
-   * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
-   *
-   * The returned list should be ordered by ascending weights (i.e. the
-   * head of the list should have the smallest weight), where the weight
-   * of a leaf is the frequency of the character.
-   */
-    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
-  
+
+    /**
+      * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
+      *
+      * The returned list should be ordered by ascending weights (i.e. the
+      * head of the list should have the smallest weight), where the weight
+      * of a leaf is the frequency of the character.
+      */
+    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+        freqs.sortWith( (c1, c2) => c1._2 < c2._2 ).map( c => Leaf(c._1, c._2) )
+    }
+
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-    def singleton(trees: List[CodeTree]): Boolean = ???
-  
+   def singleton(trees: List[CodeTree]): Boolean = trees.length == 1
+
   /**
    * The parameter `trees` of this function is a list of code trees ordered
    * by ascending weights.
@@ -108,8 +112,11 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-    def combine(trees: List[CodeTree]): List[CodeTree] = ???
-  
+    def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+        case first :: second :: rest => makeCodeTree(first, second) :: rest sortWith ( (t1, t2) => weight(t1) < weight(t2))
+        case _ => trees
+    }
+
   /**
    * This function will be called in the following way:
    *
@@ -127,7 +134,11 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-    def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+    def until(singleton: (List[CodeTree]) => Boolean, combine: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]):
+    List[CodeTree] = {
+        if(singleton(trees)) trees
+        else until(singleton, combine)(trees)
+    }
   
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
@@ -135,7 +146,9 @@ object Huffman {
    * The parameter `chars` is an arbitrary text. This function extracts the character
    * frequencies from that text and creates a code tree based on them.
    */
-    def createCodeTree(chars: List[Char]): CodeTree = ???
+    def createCodeTree(chars: List[Char]): CodeTree = {
+        until(singleton, combine)(makeOrderedLeafList(times(chars))).head;
+    }
   
 
   // Part 3: Decoding
@@ -146,7 +159,9 @@ object Huffman {
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-    def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+    def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+        def traverse(tree: CodeTree, bits: List[Bit])
+    }
   
   /**
    * A Huffman coding tree for the French language.
